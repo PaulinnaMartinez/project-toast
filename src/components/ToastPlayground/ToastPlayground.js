@@ -4,6 +4,7 @@ import Button from '../Button';
 
 import styles from './ToastPlayground.module.css';
 import ToastShelf from '../ToastShelf';
+import { ToastContext } from '../ToastProvider';
 
 const VARIANT_OPTIONS = ['notice', 'warning', 'success', 'error'];
 
@@ -11,33 +12,10 @@ function ToastPlayground() {
 
   const [variant, setVariant] = React.useState(VARIANT_OPTIONS[0]);
   const [text, setText] = React.useState("");
-  const [toasties, setToasties] = React.useState([]);
+  const { addToast } = React.useContext(ToastContext);
 
-  function handleToasties(id) {
-    console.log(toasties);
-
-    toasties.find(i => i.id == id).visible = false;
-
-    const newToasties = toasties.filter(toast => {
-      return toast.id !== id;
-    })
-
-    setToasties(newToasties);
-  }
-
-  function addToast() {
-    event.preventDefault();
-
-    const newToast = {
-      variant,
-      text,
-      visible: true,
-      id: crypto.randomUUID()
-    }
-
-    let newToasties = [...toasties, newToast]
-
-    setToasties(newToasties);
+  function add() {
+    addToast(variant, text);
     setText("");
     setVariant(VARIANT_OPTIONS[0]);
   }
@@ -49,9 +27,9 @@ function ToastPlayground() {
         <h1>Toast Playground</h1>
       </header>
 
-      <ToastShelf toasties={toasties} handleToasties={handleToasties} />
+      <ToastShelf />
 
-      <form onSubmit={() => addToast()}>
+      <form onSubmit={() => add()}>
         <div className={styles.controlsWrapper}>
           <div className={styles.row}>
             <label
@@ -74,7 +52,6 @@ function ToastPlayground() {
               {VARIANT_OPTIONS.map((option) => {
 
                 const btnName = `variant-${option}`;
-
 
                 return (
                   <label key={option} htmlFor={btnName}>
@@ -99,10 +76,7 @@ function ToastPlayground() {
             <div
               className={`${styles.inputWrapper} ${styles.radioWrapper}`}
             >
-              <Button
-              // onClick={() => { setVisible(true) }}
-              // onClick={() => { addToast() }}
-              >Pop Toast!</Button>
+              <Button>Pop Toast!</Button>
             </div>
           </div>
         </div>
